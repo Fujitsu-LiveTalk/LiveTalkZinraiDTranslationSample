@@ -19,8 +19,8 @@ namespace LiveTalkZinraiDTranslationSample.Models
     {
         private const string AuthBody = "grant_type=client_credentials&scope=service_contract&client_id={0}&client_secret={1}";
         private const string UrlString = "https://zinrai-pf.jp-east-1.paas.cloud.global.fujitsu.com/DocumentTranslation/v1/translations?langFrom={0}&langTo={1}&profile=default";
-        private string ClientID = " <<<<<client_id>>>>>";
-        private string ClientPassword = " <<<<<client_secret>>>>>";
+        private string ClientID = "aitrial01_4"; //" <<<<<client_id>>>>>";
+        private string ClientPassword = "0}B7Cfeb"; //" <<<<<client_secret>>>>>";
         private string ProxyServer = "";    // PROXY経由なら proxy.hogehoge.jp:8080 のように指定
         private string ProxyId = "";        // 認証PROXYならIDを指定
         private string ProxyPassword = "";  // 認証PROXYならパスワードを指定
