@@ -1,7 +1,7 @@
 # LiveTalkZinraiDTranslationSample
 LiveTalk常時ファイル出力で出力したテキストを、Zinrai 文書翻訳で翻訳し、その結果をLiveTalk画面に表示するサンプルです。  
 LiveTalkが実装しているリアルタイム翻訳（弊社特許）ではなく、一般的な逐次翻訳（発話が終わってからの翻訳）になります。
-本サンプルコードは、.NET Core 2.2で作成しています。コードレベルでは.NET Framework 4.6と互換性があります。
+本サンプルコードは、.NET Core 3.0で作成しています。コードレベルでは.NET Framework 4.6と互換性があります。
 
 ![Process](https://github.com/FujitsuSSL-LiveTalk/LiveTalkZinraiDTranslationSample/blob/images/README.png)
 
