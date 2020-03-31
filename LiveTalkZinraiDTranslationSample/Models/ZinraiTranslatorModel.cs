@@ -1,7 +1,7 @@
 ﻿/*
  * Copyright 2019 FUJITSU SOCIAL SCIENCE LABORATORY LIMITED
  * クラス名　：ZinraiTranslatorModel
- * 概要      ：Zinrai 文書翻訳 APIと連携
+ * 概要      ：Zinrai Translation Service APIと連携
 */
 using System;
 using System.Collections.Generic;
