@@ -1,7 +1,7 @@
 ﻿/*
  * Copyright 2019 FUJITSU SOCIAL SCIENCE LABORATORY LIMITED
  * クラス名　：ZinraiTranslatorModel
- * 概要      ：Zinrai 文書翻訳 APIと連携
+ * 概要      ：ZinraiTranslationService APIと連携
 */
 using System;
 using System.Collections.Generic;
@@ -17,10 +17,10 @@ namespace LiveTalkZinraiDTranslationSample.Models
 {
     public class ZinraiTranslatorModel
     {
-        private const string AuthBody = "grant_type=client_credentials&scope=service_contract&client_id={0}&client_secret={1}";
-        private const string UrlString = "https://zinrai-pf.jp-east-1.paas.cloud.global.fujitsu.com/DocumentTranslation/v1/translations?langFrom={0}&langTo={1}&profile=default";
-        private string ClientID = "aitrial01_4"; //" <<<<<client_id>>>>>";
-        private string ClientPassword = "0}B7Cfeb"; //" <<<<<client_secret>>>>>";
+        private const string UrlString = "https://api.aispf.global.fujitsu.com/ZinraiTranslation/v1/translations"; //"<<<<<Zinrai Translation Service エンドポイント>>>>>"
+        private const string OAuthUrlString = "https://api.aispf.global.fujitsu.com/auth/v1/tokens"; //"<<<<<Zinrai Translation Service エンドポイント>>>>>"
+        private string ClientID = "8b33f0ea-53fe-4e84-a9ab-52756ad517f2"; //"<<<<<client_id>>>>>";
+        private string ClientPassword = "b5cefd8d-1fa1-42b2-99b5-e81e1a69df32"; //"<<<<<client_secret>>>>>";
         private string ProxyServer = "";    // PROXY経由なら proxy.hogehoge.jp:8080 のように指定
         private string ProxyId = "";        // 認証PROXYならIDを指定
         private string ProxyPassword = "";  // 認証PROXYならパスワードを指定
@@ -86,9 +86,8 @@ namespace LiveTalkZinraiDTranslationSample.Models
                             }
                         }
                         request.Method = HttpMethod.Post;
-                        request.RequestUri = new Uri(string.Format(UrlString, orignalLangCode, langCode));
+                        request.RequestUri = new Uri(string.Format(UrlString + "?langFrom={0}&langTo={1}&profile=default", orignalLangCode, langCode));
                         request.Headers.Add("X-Access-Token", this.AccessToken);
-                        request.Headers.Add("X-Service-Code", "FJAI000015-00001");
                         request.Content = new StringContent(questionJsonString, Encoding.UTF8, "application/json");
                         request.Headers.Add("Connection", "close");
                         client.Timeout = TimeSpan.FromSeconds(10);
@@ -103,9 +102,7 @@ namespace LiveTalkZinraiDTranslationSample.Models
                                 {
                                     var result = ser.ReadObject(json) as TResult;
                                     translation = result.response.translation;
-#if !WINDOWS_UWP
                                     json.Close();
-#endif
                                 }
                             }
                         }
@@ -160,20 +157,40 @@ namespace LiveTalkZinraiDTranslationSample.Models
                 {
                     using (var request = new HttpRequestMessage())
                     {
+                        var authBodyJsonString = "";
+                        {
+                            using (var ms = new MemoryStream())
+                            {
+                                var serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(TAuthReq));
+                                var body = new TAuthReq()
+                                {
+                                    clientId = this.ClientID,
+                                    clientSecret = this.ClientPassword
+                                };
+                                using (var sr = new StreamReader(ms))
+                                {
+                                    serializer.WriteObject(ms, body);
+                                    ms.Position = 0;
+                                    authBodyJsonString = sr.ReadToEnd();
+                                }
+                            }
+                        }
                         request.Method = HttpMethod.Post;
-                        request.RequestUri = new Uri("https://auth-api.jp-east-1.paas.cloud.global.fujitsu.com/API/oauth2/token?key=" + DateTime.Now.ToString("HHmmss"));
-                        request.Content = new StringContent(string.Format(AuthBody, this.ClientID, this.ClientPassword), Encoding.UTF8, "application/x-www-form-urlencoded");
+                        request.RequestUri = new Uri(OAuthUrlString);
                         request.Headers.Add("Connection", "close");
                         client.Timeout = TimeSpan.FromSeconds(10);
+                        request.Content = new ByteArrayContent(Encoding.UTF8.GetBytes(authBodyJsonString)); // Content-Typeを無理やりつける
+                        request.Content.Headers.TryAddWithoutValidation(@"Content-Type", @"application/json");
+                        request.Headers.Add("Accept", "application/json");
                         var response = await client.SendAsync(request);
                         var jsonString = await response.Content.ReadAsStringAsync();
                         using (var json = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(jsonString)))
                         {
-                            var ser = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(TFujitsuK5Auth));
+                            var ser = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(TAuthRes));
                             {
-                                var result = ser.ReadObject(json) as TFujitsuK5Auth;
-                                token = result.access_token;
-                                this.TokenExpireUtcTime = DateTime.UtcNow.AddSeconds(result.expires_in - 60);
+                                var result = ser.ReadObject(json) as TAuthRes;
+                                token = result.accessToken;
+                                this.TokenExpireUtcTime = DateTime.UtcNow.AddSeconds(result.expiration - 60);
                             }
                         }
                     }
@@ -192,42 +209,32 @@ namespace LiveTalkZinraiDTranslationSample.Models
             return token;
         }
 
-        #region "K5認証"
-        [DataContract]
-        public class TFujitsuK5Auth
+        #region "ZinraiTranslationService認証"
+        public class TAuthReq
         {
             [DataMember]
-            public string access_token { get; set; }
+            public string clientId { get; set; }
             [DataMember]
-            public string token_type { get; set; }
-            [DataMember]
-            public int expires_in { get; set; }
-            [DataMember]
-            public string scope { get; set; }
-            [DataMember]
-            public string client_id { get; set; }
-            [DataMember]
-            public TContract_Info contract_info { get; set; }
+            public string clientSecret { get; set; }
         }
 
         [DataContract]
-        public class TContract_Info
+        public class TAuthRes
         {
             [DataMember]
-            public TContract_List[] contract_list { get; set; }
-        }
-
-        [DataContract]
-        public class TContract_List
-        {
+            public string accessToken { get; set; }
             [DataMember]
-            public string service_contract_id { get; set; }
+            public string refreshToken { get; set; }
             [DataMember]
-            public string service_code { get; set; }
+            public int expiration { get; set; }
+            [DataMember]
+            public string message { get; set; }
+            [DataMember]
+            public string code { get; set; }
         }
         #endregion
 
-        #region "Zinrai文書翻訳"
+        #region "ZinraiTranslationService"
         [DataContract]
         public class TTranslatorItem
         {

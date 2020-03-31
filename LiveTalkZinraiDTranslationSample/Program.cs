@@ -1,7 +1,7 @@
 ﻿/*
  * Copyright 2019 FUJITSU SOCIAL SCIENCE LABORATORY LIMITED
  * システム名：LiveTalkZinraiDTranslationSample
- * 概要      ：Zinrai文書翻訳 連携サンプルアプリ
+ * 概要      ：ZinraiTranslationService 連携サンプルアプリ
 */
 ////using NAudio.Wave;
 using LiveTalk;
