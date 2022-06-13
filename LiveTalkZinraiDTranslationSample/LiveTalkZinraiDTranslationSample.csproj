@@ -1,8 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
+    <Company>FUJITSU LIMITED</Company>
+    <Copyright>COPYRIGHT (C) 2022 FUJITSU LIMITED</Copyright>
   </PropertyGroup>
 
 </Project>

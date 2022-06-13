@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2019 FUJITSU SOCIAL SCIENCE LABORATORY LIMITED
+ * Copyright 2022 FUJITSU LIMITED
  * システム名：LiveTalkZinraiDTranslationSample
  * 概要      ：Zinrai Translation Service 連携サンプルアプリ
 */

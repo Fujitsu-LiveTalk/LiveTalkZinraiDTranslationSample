@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2019 FUJITSU SOCIAL SCIENCE LABORATORY LIMITED
+ * Copyright 2022 FUJITSU LIMITED
  * クラス名　：FileCollaboration
  * 概要      ：LiveTalkの常時ファイル入力/常時ファイル出力と連携
 */
@@ -89,16 +89,13 @@ namespace LiveTalk
                             {
                                 using (var saveFile = new System.IO.FileStream(intputFileName, FileMode.Open, FileAccess.Read, FileShare.None))
                                 {
-                                    using (Stream fs = saveFile)
+                                    using (var sr = new StreamReader(saveFile, Encoding.UTF8))
                                     {
-                                        using (StreamReader sr = new StreamReader(fs, Encoding.UTF8))
+                                        // ファイルの終わりまで入力する
+                                        while (!sr.EndOfStream)
                                         {
-                                            // ファイルの終わりまで入力する
-                                            while (!sr.EndOfStream)
-                                            {
-                                                var message = sr.ReadLine();
-                                                OnMessageReceived(message);
-                                            }
+                                            var message = sr.ReadLine();
+                                            OnMessageReceived(message);
                                         }
                                     }
                                 }
@@ -133,17 +130,13 @@ namespace LiveTalk
             {
                 using (var saveFile = new System.IO.FileStream(this.OutputFileName, FileMode.Append, FileAccess.Write, FileShare.Delete | FileShare.ReadWrite))
                 {
-                    using (Stream fs = saveFile)
+                    using (var sw = new StreamWriter(saveFile, Encoding.UTF8))
                     {
-
-                        using (StreamWriter sw = new StreamWriter(fs, Encoding.UTF8))
-                        {
-                            sw.WriteLine(message);
-                            sw.Flush();
-                            sw.Close();
-                        }
-                        fs.Close();
+                        sw.WriteLine(message);
+                        sw.Flush();
+                        sw.Close();
                     }
+                    saveFile.Close();
                 }
             }
         }

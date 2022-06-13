@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2019 FUJITSU SOCIAL SCIENCE LABORATORY LIMITED
+ * Copyright 2022 FUJITSU LIMITED
  * クラス名　：ZinraiTranslatorModel
  * 概要      ：Zinrai Translation Service APIと連携
 */
@@ -17,8 +17,8 @@ namespace LiveTalkZinraiDTranslationSample.Models
 {
     public class ZinraiTranslatorModel
     {
-        private const string UrlString = "<<<<<Zinrai Translation Service エンドポイント>>>>>"
-        private const string OAuthUrlString = "<<<<<Zinrai Translation Service エンドポイント>>>>>"
+        private const string UrlString = "<<<<<Zinrai Translation Service エンドポイント>>>>>";
+        private const string OAuthUrlString = "<<<<<Zinrai Translation Service エンドポイント>>>>>";
         private string ClientID = "<<<<<client_id>>>>>";
         private string ClientPassword = "<<<<<client_secret>>>>>";
         private string ProxyServer = "";    // PROXY経由なら proxy.hogehoge.jp:8080 のように指定
